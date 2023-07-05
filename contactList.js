@@ -1,4 +1,5 @@
 import { LightningElement, wire, track } from 'lwc';
+import { refreshApex } from '@salesforce/apex';
 import getContacts from '@salesforce/apex/ContactController.getContacts';
 
 const columns = [
@@ -8,17 +9,25 @@ const columns = [
 ];
 
 export default class ContactList extends LightningElement {
-    @track contacts = [];
+    @track contacts = {
+        data: undefined,
+        error: undefined
+    };
     columns = columns;
 
     @wire(getContacts)
-    wiredContacts({ error, data }) {
+    wiredContacts(result) {
+        const { data, error } = result;
         if (data) {
-            this.contacts = data.map((contact) => {
-                return { ...contact, Id: contact.Id };
-            });
+            this.contacts.data = data;
+            this.contacts.error = undefined;
         } else if (error) {
-            console.error('Error retrieving contacts:', error);
+            this.contacts.error = error;
+            this.contacts.data = undefined;
         }
+    }
+
+    refreshData() {
+        return refreshApex(this.wiredContacts);
     }
 }
