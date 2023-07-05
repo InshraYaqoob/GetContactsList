@@ -1,10 +1,14 @@
 <template>
-    <lightning-card title="Contact List">
+    <lightning-card title="Contact List" if:true={contacts.data}>
         <lightning-datatable
             key-field="Id"
-            data={contactData}
+            data={contacts.data}
             columns={columns}
             hide-checkbox-column="true">
         </lightning-datatable>
     </lightning-card>
+
+    <template if:true={contacts.error}>
+        <div class="error">{contacts.error}</div>
+    </template>
 </template>
